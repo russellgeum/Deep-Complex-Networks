@@ -30,10 +30,8 @@
 ![zReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/zReLU.png)  
 ### ModReLU  
 ![ModReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/ModReLU.png)  
-CReLU와 zReLU의 차이점은 아래와 같다.  
-- 페이저의 구간에 따라 실수부 or 허수부 값만 살린다. (이것은 CReLU에 해당)  
-- 아니면 오로지 0, pi/2 구간에서의 페이저만 보존하고 나머지 복소수는 모두 버려도 된다. (이것은 zReLU에 해당)
-- 3사분면 복소수는 두 활성 함수에서 모두 버린다.
-결론  
+CReLU와 zReLU의 차이점  
 - CReLU에서는 2사분면 복소수는 허수부 값만 취하고, 4사분면 복소수는 실수부 값만 취한다.
 - zReLU에서는 2사분면, 4사분면 복소수 모두 버린다.
+- 3사분면 복소수는 두 활성 함수에서 모두 버린다.  
+- 
