@@ -23,7 +23,4 @@
 ![cnn](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/architect1.PNG)  
 ## Activation Functions  
 ![act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation1.PNG)  
-
-
-# 추가적인 이해  
-## Cauchy–Riemann equations
+### Cauchy–Riemann equations
