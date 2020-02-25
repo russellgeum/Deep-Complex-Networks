@@ -21,6 +21,13 @@
 # Complex Networks의 구조 (Convolution 위주로)  
 ## Convolution Networks, Residual Network  
 ![cnn](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/architect1.PNG)  
-## Activation Functions  
+## 제안된 Activation Functions  
 ![act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation1.PNG)  
-### Cauchy–Riemann equations
+### 복소수들이 이 활성 함수에 입력되면 어떤 모양이 될까?  
+#### CReLU  
+![CReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/CReLU.png)  
+#### zReLU  
+![zReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/zReLU.png)  
+#### ModReLU  
+![ModReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/ModReLU.png)  
+
