@@ -19,7 +19,11 @@
 이를 이용하여 복소수 영역에서의 이미지 분류 문제를 만들어보자.  
 
 # Complex Networks의 구조 (Convolution 위주로)  
-## Convolution Networks, Residual Networks  
+## Convolution Networks, Residual Network  
 ![cnn](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/architect1.PNG)  
 ## Activation Functions  
 ![act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation1.PNG)  
+
+
+# 추가적인 이해  
+## Cauchy–Riemann equations
