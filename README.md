@@ -33,5 +33,6 @@ CReLU와 zReLU의 차이점
 - CReLU에서는 2사분면 복소수는 허수부 값만 취하고, 4사분면 복소수는 실수부 값만 취한다.
 - zReLU에서는 2사분면, 4사분면 복소수 모두 버린다.
 - 3사분면 복소수는 두 활성 함수에서 모두 버린다.  
-## 2D FFT를 적용한 이미지  
+#
+## 2D FFT를 적용한 모습  
 ![sample](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/2D%20FFT.png)  
