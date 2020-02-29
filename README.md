@@ -28,6 +28,7 @@
 ![act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation1.PNG)  
 #
 복소수들이 이 활성 함수에 입력되면 어떤 모양이 되는지, 직접 활성 함수를 구현하여 값의 분포를 그려보자  
+800여 개의 복소수들을 준비하고, 각각의 활성 함수에 입력하였다. 순서대로 CReLU, zReLU, modReLU이다.  
 ![Act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation2.png)
 #
 CReLU와 zReLU의 차이점  
