@@ -26,13 +26,9 @@
 ![cnn](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/architect1.PNG)  
 ## 제안된 Activation Functions  
 ![act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation1.PNG)  
+#
 복소수들이 이 활성 함수에 입력되면 어떤 모양이 되는지, 직접 활성 함수를 구현하여 값의 분포를 그려보자  
-### CReLU  
-![CReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/CReLU.png)  
-### zReLU  
-![zReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/zReLU.png)  
-### ModReLU  
-![ModReLU](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/ModReLU.png)  
+![Act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation2.png)
 #
 CReLU와 zReLU의 차이점  
 - CReLU에서는 2사분면 복소수는 허수부 값만 취하고, 4사분면 복소수는 실수부 값만 취한다.
