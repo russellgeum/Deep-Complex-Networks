@@ -1,16 +1,10 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import numpy as np
 import tensorflow as tf
+
 
 """
 datagenerator for mnist images
 """
-
 class dataGenerator():
     
     def __init__ (self):
@@ -55,4 +49,3 @@ class dataGenerator():
         output2 = self.testLabel
         
         return output1, output2
-
