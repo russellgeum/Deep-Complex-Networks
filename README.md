@@ -29,10 +29,11 @@ numpy.fft.fft2 메서드로 discrete fourier transform을 하여 복소수 데�
 800여 개의 복소수들을 준비하고, 각각의 활성 함수에 입력하였다. 순서대로 CReLU, zReLU, modReLU이다.  
 ![Act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation2.png)
 #
-CReLU와 zReLU의 차이점  
-- CReLU에서는 2사분면 복소수는 허수부 값만 취하고, 4사분면 복소수는 실수부 값만 취한다.
-- zReLU에서는 2사분면, 4사분면 복소수 모두 버린다.
+활성 함수들의 특징    
+- CReLU에서는 2사분면 복소수는 허수부 값만 취하고, 4사분면 복소수는 실수부 값만 취한다.  
+- zReLU에서는 2사분면, 4사분면 복소수 모두 버린다.  
 - 3사분면 복소수는 두 활성 함수에서 모두 버린다.  
+- 활성 함수는 preserve region에서 Cauchy–Riemann equations 조건을 만족한다.  
 #
 ## 2D FFT를 적용한 모습  
 ![sample](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/2D%20FFT.png)  
