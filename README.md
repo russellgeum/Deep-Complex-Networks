@@ -42,6 +42,11 @@ numpy.fft.fft2 메서드로 discrete fourier transform을 하여 복소수 데�
 ### 테스트 환경
 - Adam(learning_rate = 0.001) && RMSprop(learning_rate = 0.001)  
 - Batch size = 512, Epoch = 20, same architecture  
-#
-![conclusion](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/conclusion1.jpg)  
-#
+### adam optimizer에서 C, z, mod 테스트
+![a1](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/adam%20CReLU.png)  
+![a2](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/adam%20zReLU.png)  
+![a3](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/adam%20modReLU.png)  
+### RMSprop optimzier에서 테스트
+![R1](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/rmsp%20CReLU.png)  
+![R2](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/rmsp%20zReLU.png)  
+![R3](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/rmsp%20modReLU.png)  
