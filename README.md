@@ -37,3 +37,11 @@ numpy.fft.fft2 메서드로 discrete fourier transform을 하여 복소수 데�
 #
 ## 2D FFT를 적용한 모습  
 ![sample](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/2D%20FFT.png)  
+#
+## 활성함수 마다의 테스트 결과  
+### 테스트 환경
+- Adam(learning_rate = 0.001) && RMSprop(learning_rate = 0.001)  
+- Batch size = 512, Epoch = 20, same architecture  
+#
+![conclusion](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/conclusion1.jpg)  
+#
