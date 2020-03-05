@@ -55,6 +55,6 @@ numpy.fft.fft2 메서드로 discrete fourier transform을 하여 복소수 데�
 - modReLU는 이 조건에서는 가장 성능이 낮음  
 - RMSprop에서의 modReLU는 Adam에 비해 loss 변동이 큼  
 # 차후에 수행할 실험과 생각할 것
-- Cifar10, Cifar100에서 테스트를 해볼 필요
+- Cifar10, Cifar100을 이용하여 더 큰 신경망에서 성능 테스트를 해볼 필
 - LSTM 모델에서는 Cauchy–Riemann equations을 만족하는 activation function이 존재하지 않음
 - Batch normalization과 Pooling 등 기타 모듈은 차후에 구현
