@@ -21,13 +21,13 @@ numpy.fft.fft2 메서드로 discrete fourier transform을 하여 복소수 데�
 #
 # Complex Networks의 구조 (Convolution 위주로)  
 ## Convolution Networks, Residual Network  
-![cnn](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/architect1.PNG)  
+![cnn](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/architect_picture.png)  
 ## 제안된 Activation Functions  
 ![act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation_concept.png)  
 #
 복소수들이 이 활성 함수에 입력되면 어떤 모양이 되는지, 직접 활성 함수를 구현하여 값의 분포를 그려보자  
 800여 개의 복소수들을 준비하고, 각각의 활성 함수에 입력하였다. 순서대로 CReLU, zReLU, modReLU이다.  
-![Act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation2.png)
+![Act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation_result.png)
 #
 활성 함수들의 특징    
 - CReLU에서는 2사분면 복소수는 허수부 값만 취하고, 4사분면 복소수는 실수부 값만 취한다.  
