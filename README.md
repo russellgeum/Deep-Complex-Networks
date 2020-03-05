@@ -1,4 +1,4 @@
-# 논문, 아래 두 개는 추가 참고  
+# 논문, (2번, 3번은 추가 참고)  
 - Deep Complex Networks (ICLR 2018)  
   URL : https://arxiv.org/abs/1705.09792  
 - On Complex Valued Convolutional Neural Networks  
