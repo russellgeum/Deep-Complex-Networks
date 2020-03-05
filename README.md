@@ -53,7 +53,7 @@ numpy.fft.fft2 메서드로 discrete fourier transform을 하여 복소수 데�
 #
 - 셋 중 zReLU가 가장 안정적인 성능을 보임  
 - modReLU는 이 조건에서는 가장 성능이 낮음  
-- RMSprop에서의 modReLU는 Adam loss 변동이 큼  
+- RMSprop에서의 modReLU는 Adam에 비해 loss 변동이 큼  
 # 차후에 수행할 실험과 생각할 것
 - Cifar10, Cifar100에서 테스트를 해볼 필요
 - LSTM 모델에서는 Cauchy–Riemann equations을 만족하는 activation function이 존재하지 않음
