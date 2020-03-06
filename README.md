@@ -48,6 +48,7 @@
 ![a2](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/adam%20zReLU.png)  
 ![a3](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/adam%20modReLU.png)  
 ### RMSprop optimzier에서 테스트
+사진에서 오류 정정 : 순서대로 CReLU, zReLU, modReLU 사진임  
 ![R1](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/rmsp%20CReLU.png)  
 ![R2](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/rmsp%20zReLU.png)  
 ![R3](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/rmsp%20modReLU.png)  
