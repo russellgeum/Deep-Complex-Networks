@@ -15,14 +15,14 @@
 그리고 복소수 영역에서의 활성 함수 성능을 살펴보고 따르는 수학적 이슈를 검토.  
 #
 # 사용한 데이터셋  
-개념에 적용하기 쉬운 MNIST로 먼저 테스트  
-이후 Cifar-10, Cifar-100으로 테스트  
+개념에 적용하기 쉬운 MNIST로 먼저 테스트, 이후 Cifar-10, Cifar-100으로 테스트  
 이미지를 discrete fourier transform을 하여 복소수 도메인으로 변환  
 #
-# Complex Networks의 구조 (Convolution 위주로)  
-## Convolution Networks, Residual Network  
+# 네트워크의 가장 작은 unit  
+![unit](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/unit.png)  
+## Convolution Networks  
 ![cnn](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/architect_picture.png)  
-## 제안된 Activation Functions  
+## Activation Functions  
 ![act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation_concept.png)  
 #
 복소수들이 이 활성 함수에 입력되면 어떤 모양이 되는지, 직접 활성 함수를 구현하여 출럭값의 분포를 그려보자  
