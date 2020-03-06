@@ -54,7 +54,6 @@
 ![R3](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/rmsp%20modReLU.png)  
 #
 - 셋 중 zReLU가 가장 안정적인 성능을 보임  
-- modReLU는 이 조건에서는 가장 성능이 낮음  
 - RMSprop에서의 modReLU는 Adam에 비해 loss 변동이 큼  
 - modReLU는 성능이 그리 좋지 못한 것 같다. (일단은 논문의 견해와 일치)  
 # 차후에 수행할 실험과 생각할 것
