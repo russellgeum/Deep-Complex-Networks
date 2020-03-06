@@ -29,7 +29,7 @@
 복소수들이 이 활성 함수에 입력되면 어떤 모양이 되는지, 직접 활성 함수를 구현하여 출럭값의 분포를 그려보자  
 800여 개의 복소수들을 준비하고, 각각의 활성 함수에 입력하였다. 순서대로 CReLU, zReLU, modReLU이다.  
 ![Act](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/activation_result.png)
-### Activation Function 특징  
+### Activation function 특징  
 - activation function은 preserve region에서 Cauchy–Riemann equations 조건을 만족한다.  
 - CReLU에서는 2사분면 복소수는 허수부 값만 취하고, 4사분면 복소수는 실수부 값만 취한다.  
 - zReLU에서는 2사분면, 4사분면 복소수 모두 버린다.  
@@ -39,7 +39,7 @@
 왼쪽은 실수부, 오른쪽은 허수부
 ![sample](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/images/2D%20FFT.png)  
 #
-## 활성 함수 별로 테스트
+## Activation function 테스트
 ### 테스트 환경
 - Adam(learning_rate = 0.001) && RMSprop(learning_rate = 0.001)  
 - Batch size = 512, Epoch = 20, same architecture  
