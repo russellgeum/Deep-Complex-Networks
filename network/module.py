@@ -69,8 +69,97 @@ class complexConv2D ():
         
         return output1, output2
 
+    
 
+class complexPooling ():
+    """
+    tf.keras.layers.MaxPool2D(
+    pool_size=(2, 2), strides=None, padding='valid', data_format=None, **kwargs)
+    """
+    
+    def __init__ (self, 
+                pool_size = (2, 2), 
+                strides = None, 
+                padding = "valid"):
 
+        self.pool_size = pool_size
+        self.strides = strides
+        self.padding = padding
+
+        
+    def fowardPooling (self, real_inputs, imag_inputs):
+
+        realOutputs = tf.keras.layers.MaxPool2D(pool_size = self.pool_size, 
+                                                strides = self.strides, 
+                                                padding = self.padding) (real_inputs)
+        imagOutputs = tf.keras.layers.MaxPool2D(pool_size = self.pool_size, 
+                                                strides = self.strides, 
+                                                padding = self.padding) (imag_inputs)
+
+        output1 = realOutputs
+        output2 = imagOutputs
+
+        return output1, output2
+    
+    
+    
+class complexBN ():
+    """
+    tf.keras.layers.BatchNormalization(
+    axis=-1, momentum=0.99, epsilon=0.001, center=True, scale=True,
+    beta_initializer='zeros', gamma_initializer='ones',
+    moving_mean_initializer='zeros', moving_variance_initializer='ones',
+    beta_regularizer=None, gamma_regularizer=None, beta_constraint=None,
+    gamma_constraint=None, renorm=False, renorm_clipping=None, renorm_momentum=0.99,
+    fused=None, trainable=True, virtual_batch_size=None, adjustment=None, name=None)
+    """
+    
+    def __init__ (self,
+                momentum=0.99, 
+                epsilon=0.001, 
+                center=True, 
+                scale=True,
+                beta_initializer='zeros', 
+                gamma_initializer='ones',
+                moving_mean_initializer='zeros', 
+                moving_variance_initializer='ones'):
+        
+        self.momentum = momentum
+        self.epsilon = epsilon
+        self.center = center
+        self.scale = scale
+        self.beta_initializer = beta_initializer
+        self.gamma_initializer = gamma_initializer
+        self.moving_mean_initializer = moving_mean_initializer
+        self.moving_variance_initializer = moving_variance_initializer
+        
+        
+    def fowardBN (self, real_inputs, imag_inputs):
+        
+        realOutputs = tf.keras.layers.BatchNormalization(momentum = self.momentum, 
+                                epsilon = self.epsilon, 
+                                center = self.center, 
+                                scale = self.scale,
+                                beta_initializer = self.beta_initializer, 
+                                gamma_initializer = self.gamma_initializer,
+                                moving_mean_initializer = self.moving_mean_initializer,
+                                moving_variance_initializer = self.moving_variance_initializer)(real_inputs)
+        imagOutputs = tf.keras.layers.BatchNormalization(momentum = self.momentum, 
+                                epsilon = self.epsilon, 
+                                center = self.center, 
+                                scale = self.scale,
+                                beta_initializer = self.beta_initializer, 
+                                gamma_initializer = self.gamma_initializer,
+                                moving_mean_initializer = self.moving_mean_initializer,
+                                moving_variance_initializer = self.moving_variance_initializer)(imag_inputs)
+
+        output1 = realOutputs
+        output2 = imagOutputs
+
+        return output1, output2
+
+    
+    
 class complexDense():
     """
     tf.keras.layers.Dense(
