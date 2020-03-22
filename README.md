@@ -59,4 +59,3 @@
 # 차후에 수행할 실험과 생각할 것
 - Cifar10, Cifar100을 이용하여 더 큰 신경망에서 논문대로의 성능이 나오는지 확인할 필요  
 - LSTM 모델에서는 Cauchy–Riemann equations을 만족하는 activation function의 존재성에 대한 질문
-- Batch normalization과 Pooling 등 기타 모듈은 차후에 구현
