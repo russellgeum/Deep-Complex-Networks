@@ -1,105 +1,141 @@
 import tensorflow as tf
-from tensorflow.keras import *
-from tensorflow.keras.layers import *
-from tensorflow.keras.activations import *
-from tensorflow.keras.optimizers import *
 
 
-class complexConv2D ():
-    """
-    tf.keras.layers.Conv2D(filters, 
-                            kernel_size, 
-                            strides=(1, 1), 
-                            padding='valid', 
-                            data_format=None,
-                            dilation_rate=(1, 1), 
-                            activation=None, 
-                            use_bias=True,
-                            kernel_initializer='glorot_uniform', 
-                            bias_initializer='zeros',
-                            kernel_regularizer=None, 
-                            bias_regularizer=None, 
-                            activity_regularizer=None,
-                            kernel_constraint=None, 
-                            bias_constraint=None, 
-                            **kwargs)
-    """
+
+def Conv2D (real_inputs, imag_inputs, filters, kernel_size):
     
-    def __init__ (self, filters, 
-                        kernel_size = (3, 3), 
-                        strides = (2, 2), 
-                        padding = "same", 
-                        data_format=None,
-                        dilation_rate=(1, 1), 
-                        activation=None, 
-                        use_bias=True,
-                        kernel_initializer='glorot_uniform', 
-                        bias_initializer='zeros',
-                        kernel_regularizer=None, 
-                        bias_regularizer=None, 
-                        activity_regularizer=None,
-                        kernel_constraint=None, 
-                        bias_constraint=None):
-        
-        self.kernel_size = kernel_size
-        self.strides     = strides
-        self.padding     = padding
-        self.activation  = activation
-        
-        self.realConv2D = Conv2D(filters, 
-                                 kernel_size = self.kernel_size, 
-                                 strides = self.strides,
-                                 padding = self.padding,
-                                 activation = self.activation)
-                                 
-        self.imagConv2D = Conv2D(filters, 
-                                 kernel_size = self.kernel_size, 
-                                 strides = self.strides,
-                                 padding = self.padding,
-                                 activation = self.activation)
-        
-        
-    def fowardConvolution (self, real_inputs, imag_inputs):
+    class complexConv2D ():
+
+        def __init__ (self,
+                    strides = (1, 1), 
+                    padding = "same", 
+                    activation = None, 
+                    use_bias = True,
+                    kernel_initializer = 'glorot_uniform', 
+                    bias_initializer = 'zeros'):
+
+            self.filters = filters
+            self.kernel_size = kernel_size
+            self.strides     = strides
+            self.padding     = padding
+            self.activation  = activation
+            self.use_bias    = use_bias
+            self.kernel_initializer = kernel_initializer
+            self.bias_initializer   = bias_initializer
+
+            self.realConv2D = tf.keras.layers.Conv2D(filters = self.filters,
+                                                    kernel_size = self.kernel_size, 
+                                                    strides = self.strides,
+                                                    padding = self.padding,
+                                                    activation = self.activation,
+                                                    use_bias = self.use_bias,
+                                                    kernel_initializer = self.kernel_initializer,
+                                                    bias_initializer = self.bias_initializer) 
+
+            self.imagConv2D = tf.keras.layers.Conv2D(filters = self.filters,
+                                                    kernel_size = self.kernel_size, 
+                                                    strides = self.strides,
+                                                    padding = self.padding,
+                                                    activation = self.activation,
+                                                    use_bias = self.use_bias,
+                                                    kernel_initializer = self.kernel_initializer,
+                                                    bias_initializer = self.bias_initializer) 
+
+
+        def fowardConvolution (self, real_inputs, imag_inputs):
+
+            real_output = self.realConv2D(real_inputs) - self.imagConv2D(imag_inputs)
+            imag_output = self.imagConv2D(real_inputs) + self.realConv2D(imag_inputs)
+
+            output1 = real_output
+            output2 = imag_output
+
+            return output1, output2
     
-        realOutputs = self.realConv2D (real_inputs) - self.imagConv2D  (imag_inputs)
-        imagOutputs = self.imagConv2D (real_inputs) + self.realConv2D  (imag_inputs)
-        
-        output1 = realOutputs
-        output2 = imagOutputs
-        
-        return output1, output2
-
+    Conv2D = complexConv2D()
     
-
-class complexPooling ():
-    """
-    tf.keras.layers.MaxPool2D(
-    pool_size=(2, 2), strides=None, padding='valid', data_format=None, **kwargs)
-    """
+    real_output, imag_output = Conv2D.fowardConvolution(real_inputs, imag_inputs)
     
-    def __init__ (self, 
-                pool_size = (2, 2), 
-                strides = None, 
-                padding = "valid"):
+    output1 = real_output
+    output2 = imag_output
+    
+    return output1, output2
 
-        self.pool_size = pool_size
-        self.strides = strides
-        self.padding = padding
+
+
+def Conv2DTranspose (real_inputs, imag_inputs, filters, kernel_size):
+    
+    class complexConv2DTranspose ():
+
+        def __init__(self,
+                    strides = (2, 2), 
+                    padding = 'same', 
+                    activation = None, 
+                    use_bias = True,
+                    kernel_initializer = 'glorot_uniform', 
+                    bias_initializer = 'zeros'):
+
+            self.filters = filters
+            self.kernel_size = kernel_size
+            self.strides = strides
+            self.padding = padding
+            self.activation = activation 
+            self.use_bias = use_bias
+            self.kernel_initializer = kernel_initializer
+            self.bias_initializer = bias_initializer
+
+            self.realConv2DTranspose = tf.keras.layers.Conv2DTranspose(filters = self.filters,
+                                                            kernel_size = self.kernel_size, 
+                                                            strides = self.strides, 
+                                                            padding = self.padding, 
+                                                            activation = self.activation, 
+                                                            use_bias = self.use_bias,
+                                                            kernel_initializer = self.kernel_initializer, 
+                                                            bias_initializer = self.bias_initializer)
+
+            self.imagConv2DTranspose = tf.keras.layers.Conv2DTranspose(filters = self.filters,
+                                                            kernel_size = self.kernel_size, 
+                                                            strides = self.strides, 
+                                                            padding = self.padding, 
+                                                            activation = self.activation, 
+                                                            use_bias = self.use_bias,
+                                                            kernel_initializer = self.kernel_initializer, 
+                                                            bias_initializer = self.bias_initializer)
+
+        def fowardConv2DTranspose (self, real_inputs, imag_inputs):
+
+            real_outputs = self.realConv2DTranspose(real_inputs) - self.imagConv2DTranspose(imag_inputs)
+            imag_outputs = self.imagConv2DTranspose(real_inputs) + self.realConv2DTranspose(imag_inputs)
+
+            output1 = real_outputs
+            output2 = imag_outputs
+
+            return output1, output2
+        
+    Conv2DTranspose = complexConv2DTranspose()
+    
+    real_output, imag_output = Conv2DTranspose.fowardConv2DTranspose(real_inputs, imag_inputs)
+    
+    output1 = real_output
+    output2 = imag_output
+    
+    return output1, output2
+
 
         
-    def fowardPooling (self, real_inputs, imag_inputs):
+def Pooling (real_inputs, imag_inputs, pool_size, padding = "same"):
 
-        realOutputs = tf.keras.layers.MaxPool2D(pool_size = self.pool_size, 
-                                                strides = self.strides, 
-                                                padding = self.padding) (real_inputs)
-        imagOutputs = tf.keras.layers.MaxPool2D(pool_size = self.pool_size, 
-                                                strides = self.strides, 
-                                                padding = self.padding) (imag_inputs)
+    real_output = tf.keras.layers.MaxPool2D(pool_size = pool_size, 
+                                            strides = None, 
+                                            padding = padding) (real_inputs)
+    imag_output = tf.keras.layers.MaxPool2D(pool_size = pool_size, 
+                                            strides = None, 
+                                            padding = padding) (imag_inputs)
 
-        output1 = realOutputs
-        output2 = imagOutputs
-
-        return output1, output2
+    output1 = real_output
+    output2 = imag_output
+    
+    return output1, output2
     
     
     
