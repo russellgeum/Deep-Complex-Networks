@@ -6,15 +6,15 @@
 - Complex domain backpropagation  
   IEEE transactions on Circuits and systems II: analog and digital signal processing, 39(5):330–334, 1992.  
 #
-# Deep Complex Networks의 요약  
-1. 보통의 딥러닝의 모델들은 실수 영역에서의 파라미터를 업데이트 한다.  
-2. 그런데 꼭 실수여야 할까? 복소수 영역에서의 딥러닝 모델을 생각할 수 있을까?  
-3. 복소수 영역에서의 딥 러닝이 실수 영역보다 풍부한 표현력을 가지고 있다. (장점이 많다고 한다.)  
-4. 이 논문에서는 복소수 영역에서의 신경망 모델을 소개하고, 가능한 몇 가지 활성 함수를 소개.  
-이 repo에서는 그 중 convolution networks와 제안된 activation functions들을 구현.  
-그리고 복소수 영역에서의 활성 함수 성능을 살펴보고 따르는 수학적 이슈를 검토.  
+# About Deep Complex Networks
+1. Models of ordinary deep learning update parameters in the real numbers area.
+2. But should it be real number? Can you think about deep learning model in the field of complex numbers?
+3. Deep learning in complex numbers has more expressive power than in the real numbers. (It is said that there are many advantages.)
+4. This paper introduces the neural network module in the field of multiple numbers, and introduces some active functions as possible.
+In this repo, the solution networks and proposed activation functions are implemented.  
+It then examines the performance of active functions in the complex numbers and examines the following mathematical issues.  
 #
-# 사용한 데이터셋  
+# Datasets  
 개념에 적용하기 쉬운 MNIST로 먼저 테스트, 이후 Cifar-10, Cifar-100으로 테스트  
 이미지를 discrete fourier transform을 하여 복소수 도메인으로 변환  
 #
