@@ -1,19 +1,95 @@
-from module import *
+import tensorflow as tf
+
+
+
+# Complex Dense
+##################################################################################################
+class complex_Dense(tf.keras.layers.Layer):
+    """
+    tf.keras.layers.Dense(
+        units, activation=None, use_bias=True, kernel_initializer='glorot_uniform',
+        bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None,
+        activity_regularizer=None, kernel_constraint=None, bias_constraint=None,
+        **kwargs
+    )
+    """
+    def __init__ (self, units = 512,
+                        activation = None,
+                        use_bias   = True, 
+                        kernel_initializer = 'glorot_uniform',
+                        bias_initializer   = 'zeros', 
+                        kernel_regularizer = None, 
+                        bias_regularizer   = None,
+                        activity_regularizer = None, 
+                        kernel_constraint    = None, 
+                        bias_constraint      = None):
+        
+        super(complex_Dense, self).__init__()
+
+        self.units = units
+        self.activation = activation
+        self.use_bias   = use_bias
+        self.kernel_initializer = kernel_initializer
+        self.bias_initializer   = bias_initializer
+        self.kernel_regularizer = kernel_regularizer
+        self.bias_regularizer   = bias_regularizer
+        self.activity_regularizer = activity_regularizer
+        self.kernel_constraint    = kernel_constraint
+        self.bias_constraint      = bias_constraint
+        
+        
+    def build (self, inputs_shape):
+        
+        self.real_Dense = tf.keras.layers.Dense(units = self.units, 
+                                                activation = self.activation, 
+                                                use_bias   = self.use_bias, 
+                                                kernel_initializer = self.kernel_initializer,
+                                                bias_initializer   = self.bias_initializer, 
+                                                kernel_regularizer = self.kernel_regularizer,
+                                                bias_regularizer   = self.bias_regularizer,
+                                                activity_regularizer = self.activity_regularizer, 
+                                                kernel_constraint    = self.kernel_constraint,
+                                                bias_constraint      = self.bias_constraint)
+        
+        self.imag_Dense = tf.keras.layers.Dense(units = self.units, 
+                                                activation = self.activation, 
+                                                use_bias   = self.use_bias, 
+                                                kernel_initializer = self.kernel_initializer,
+                                                bias_initializer   = self.bias_initializer, 
+                                                kernel_regularizer = self.kernel_regularizer,
+                                                bias_regularizer   = self.bias_regularizer,
+                                                activity_regularizer = self.activity_regularizer, 
+                                                kernel_constraint    = self.kernel_constraint,
+                                                bias_constraint      = self.bias_constraint)
+        
+        super(complex_Dense, self).build(inputs_shape)
+        
+
+    def call (self, real_inputs, imag_inputs):
+
+        real_outputs = self.real_Dense(real_inputs) - self.imag_Dense(imag_inputs)
+        imag_outputs = self.imag_Dense(real_inputs) + self.real_Dense(imag_inputs)
+
+        return real_outputs, imag_outputs
+
 
 
 # Complex Convolution
 ##################################################################################################
-class complex_Conv2D ():
-
-    def __init__ (self, filters = 32,
-                        kernel_size = (3, 3), 
-                        strides = (2, 2), 
-                        padding = "same",
-                        activation = None,
-                        use_bias = True,
-                        kernel_initializer = 'glorot_uniform',
-                        bias_initializer = 'zeros'):
-
+class complex_Conv2D (tf.keras.layers.Layer):
+    
+    def __init__(self, 
+                filters = 32,
+                kernel_size = (3, 3), 
+                strides = (2, 2), 
+                padding = "same",
+                activation = None,
+                use_bias   = True,
+                kernel_initializer = 'glorot_uniform',
+                bias_initializer   = 'zeros'):
+        
+        super(complex_Conv2D, self).__init__()
+        
         self.filters = filters
         self.kernel_size = kernel_size
         self.strides     = strides
@@ -22,8 +98,11 @@ class complex_Conv2D ():
         self.use_bias    = use_bias
         self.kernel_initializer = kernel_initializer
         self.bias_initializer   = bias_initializer
-
-        self.real_conv2d = tf.keras.layers.Conv2D(filters = self.filters,
+        
+        
+    def build (self, inputs_shape):
+        
+        self.real_Conv2D = tf.keras.layers.Conv2D(filters = self.filters,
                                                 kernel_size = self.kernel_size, 
                                                 strides = self.strides,
                                                 padding = self.padding,
@@ -32,7 +111,7 @@ class complex_Conv2D ():
                                                 kernel_initializer = self.kernel_initializer,
                                                 bias_initializer = self.bias_initializer) 
 
-        self.imag_conv2d = tf.keras.layers.Conv2D(filters = self.filters,
+        self.imag_Conv2D = tf.keras.layers.Conv2D(filters = self.filters,
                                                 kernel_size = self.kernel_size, 
                                                 strides = self.strides,
                                                 padding = self.padding,
@@ -40,28 +119,34 @@ class complex_Conv2D ():
                                                 use_bias = self.use_bias,
                                                 kernel_initializer = self.kernel_initializer,
                                                 bias_initializer = self.bias_initializer) 
+        
+        super(complex_Conv2D, self).build(inputs_shape)
 
-
-    def foward (self, real_inputs, imag_inputs):
-
-        real_outputs = self.real_conv2d(real_inputs) - self.imag_conv2d(imag_inputs)
-        imag_outputs = self.imag_conv2d(real_inputs) + self.real_conv2d(imag_inputs)
-
+        
+    def call(self, real_inputs, imag_inputs):
+        
+        real_outputs = self.real_Conv2D(real_inputs) - self.imag_Conv2D(imag_inputs)
+        imag_outputs = self.imag_Conv2D(real_inputs) + self.real_Conv2D(imag_inputs)
+        
         return real_outputs, imag_outputs
+
 
 
 # Complex Transpose Conovolution
 ##################################################################################################
-class conplex_Conv2DTranspose ():
+class conplex_Conv2DTranspose (tf.keras.layers.Layer):
+
 
     def __init__(self,  filters = 32,
                         kernel_size = (3, 3), 
                         strides = (2, 2), 
                         padding = "same",
                         activation = None,
-                        use_bias = True,
+                        use_bias   = True,
                         kernel_initializer = 'glorot_uniform',
-                        bias_initializer = 'zeros'):
+                        bias_initializer   = 'zeros'):
+        
+        super(conplex_Conv2DTranspose, self).__init__()
 
         self.filters = filters
         self.kernel_size = kernel_size
@@ -71,6 +156,9 @@ class conplex_Conv2DTranspose ():
         self.use_bias    = use_bias
         self.kernel_initializer = kernel_initializer
         self.bias_initializer   = bias_initializer
+        
+        
+    def build (self, inputs_shape):
 
         self.real_Conv2DTranspose = tf.keras.layers.Conv2DTranspose(filters = self.filters,
                                                         kernel_size = self.kernel_size, 
@@ -89,47 +177,14 @@ class conplex_Conv2DTranspose ():
                                                         use_bias = self.use_bias,
                                                         kernel_initializer = self.kernel_initializer, 
                                                         bias_initializer = self.bias_initializer)
+        
+        super(conplex_Conv2DTranspose, self).build(inputs_shape)
 
-    def foward (self, real_inputs, imag_inputs):
+        
+    def call (self, real_inputs, imag_inputs):
 
         real_outputs = self.real_Conv2DTranspose(real_inputs) - self.imag_Conv2DTranspose(imag_inputs)
         imag_outputs = self.imag_Conv2DTranspose(real_inputs) + self.real_Conv2DTranspose(imag_inputs)
-
-        return real_outputs, imag_outputs
-
-    
-# Complex Dense
-##################################################################################################
-class complex_Dense():
-    """
-    tf.keras.layers.Dense(
-        units, activation=None, use_bias=True, kernel_initializer='glorot_uniform',
-        bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None,
-        activity_regularizer=None, kernel_constraint=None, bias_constraint=None,
-        **kwargs
-    )
-    """
-    def __init__ (self, units = 62,
-                        activation = None,
-                        use_bias=True, 
-                        kernel_initializer='glorot_uniform',
-                        bias_initializer='zeros', 
-                        kernel_regularizer=None, 
-                        bias_regularizer=None,
-                        activity_regularizer=None, 
-                        kernel_constraint=None, 
-                        bias_constraint=None):
-
-        self.units = units
-        self.activation = activation
-        self.real_dense = tf.keras.layers.Dense(self.units, activation = self.activation)
-        self.imag_dense = tf.keras.layers.Dense(self.units, activation = self.activation)
-
-
-    def foward (self, real_inputs, imag_inputs):
-
-        real_outputs = self.real_dense(real_inputs) - self.imag_dense(imag_inputs)
-        imag_outputs = self.imag_dense(real_inputs) + self.real_dense(imag_inputs)
 
         return real_outputs, imag_outputs
 
@@ -137,45 +192,69 @@ class complex_Dense():
 
 # Complex Pooling 
 ##################################################################################################
-def MaxPooling (real_inputs, 
-             imag_inputs, 
-             pool_size, 
-             strides = None, 
-             padding = "same"):
+class complex_MaxPooling (tf.keras.layers.Layer):
 
-    real_outputs = tf.keras.layers.MaxPool2D(pool_size = pool_size, 
-                                            strides = strides, 
-                                            padding = padding)(real_inputs)
-    imag_outputs = tf.keras.layers.MaxPool2D(pool_size = pool_size, 
-                                            strides = strides, 
-                                            padding = padding)(imag_inputs)
-    
-    return real_outputs, imag_outputs
+    def __init__(self,
+                pool_size = (2, 2), 
+                strides   = (1, 1),
+                padding   = "same"):
+
+        super(complex_MaxPooling, self).__init__()
+
+        self.pool_size = pool_size
+        self.strides   = strides
+        self.padding   = padding
+
+
+    def build (self, inputs_shape):
         
-    
-    
-# Complex BatchNOmalization
-##################################################################################################
-def BatchNomalization (real_inputs, imag_inputs,
-                        momentum, epsilon, center, scale,
-                        beta_initializer, gamma_initializer,
-                        moving_mean_initializer, moving_variance_initializer):
+        self.real_maxpooling = tf.keras.layers.MaxPool2D(pool_size = self.pool_size, 
+                                                        strides = self.strides, 
+                                                        padding = self.padding)
+        
+        self.imag_maxpooling = tf.keras.layers.MaxPool2D(pool_size = self.pool_size, 
+                                                        strides = self.strides, 
+                                                        padding = self.padding)
+        
+        super(complex_MaxPooling, self).build(inputs_shape)
+        
 
-    real_outputs = tf.keras.layers.BatchNormalization(momentum = momentum, 
-                                            epsilon = epsilon, 
-                                            center = center, 
-                                            scale = scale,
-                                            beta_initializer = beta_initializer, 
-                                            gamma_initializer = gamma_initializer,
-                                            moving_mean_initializer = moving_mean_initializer,
-                                            moving_variance_initializer = moving_variance_initializer)(real_inputs)
-    imag_outputs = tf.keras.layers.BatchNormalization(momentum = momentum, 
-                                            epsilon = epsilon, 
-                                            center = center, 
-                                            scale = scale,
-                                            beta_initializer = beta_initializer, 
-                                            gamma_initializer = gamma_initializer,
-                                            moving_mean_initializer = moving_mean_initializer,
-                                            moving_variance_initializer = moving_variance_initializer)(imag_inputs)
+    def call (self, real_inputs, imag_inputs):
+
+        real_outputs = self.real_maxpooling(real_inputs)
+        imag_outputs = self.imag_maxpooling(imag_inputs)
+
+        return real_outputs, imag_outputs
+
+
+
+def complex_NaiveBatchNormalization (real_inputs, imag_inputs):
+
+    real_outputs = tf.keras.layers.BatchNormalization()(real_inputs)
+    imag_outputs = tf.keras.layers.BatchNormalization()(imag_inputs)
 
     return real_outputs, imag_outputs
+
+
+# # Complex BatchNOmalization
+# ##################################################################################################
+# class complex_NaiveBatchNormalization (tf.keras.layers.Layer):
+
+#     def __init__ (self):
+
+#         super(complex_NaiveBatchNormalization, self).__init__()
+
+
+#     def build (self, inputs_shape):
+
+#         self.real_batchnorm = tf.keras.layers.BatchNormalization()
+#         self.imag_batchnorm = tf.keras.layers.BatchNormalization()
+
+#         super(complex_NaiveBatchNormalization, self).build(inputs_shape)
+
+#     def call (self, real_inputs, imag_inputs):
+
+#         real_outputs = self.real_batchnorm(real_inputs)
+#         imag_outputs = self.imag_batchnorm(imag_inputs)
+
+#         return real_outputs, imag_outputs
