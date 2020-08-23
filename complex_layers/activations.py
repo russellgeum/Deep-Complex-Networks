@@ -1,12 +1,13 @@
+import numpy as np
 import tensorflow as tf
 
-def flatten (input1, input2):
+
+def complex_flatten (input1, input2):
     
     output1 = tf.keras.layers.Flatten()(input1)
     output2 = tf.keras.layers.Flatten()(input2)
     
     return output1, output2
-
 
 
 def CReLU (input1, input2):
@@ -15,7 +16,6 @@ def CReLU (input1, input2):
     output2 = tf.keras.layers.ReLU()(input2)
     
     return output1, output2
-
 
 
 def zReLU (input1, input2):
@@ -39,7 +39,6 @@ def zReLU (input1, input2):
     return real_relu, imag_relu
 
 
-
 def modReLU (input1, input2):
     
     norm = tf.abs(tf.complex(input1, input2))
@@ -52,14 +51,12 @@ def modReLU (input1, input2):
     return real, imag
 
 
-
 def CLeaky_ReLU (input1, input2):
 
     output1 = tf.nn.leaky_relu(input1)
     output2 = tf.nn.leaky_relu(input2)
 
     return output1, output2
-
 
 
 def complex_tanh (input1, input2):
@@ -70,8 +67,7 @@ def complex_tanh (input1, input2):
     return output1, output2
 
 
-
-def softmax (input1, input2):
+def complex_softmax (input1, input2):
     
     magnitude = tf.abs(tf.complex(input1, input2))
     output = tf.keras.layers.Softmax()(magnitude)
