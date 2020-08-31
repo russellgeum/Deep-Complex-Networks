@@ -8,50 +8,49 @@ import tensorflow.keras.backend as K
 from tensorflow.keras.layers import *
 
 """
-STFT_network의 입력 : [batch_size, time_step (signal length), channel == 1]
-STFT_network의 출력 : return real, imag
+STFT_network's INPUT : [batch_size, time_step (signal length), channel == 1]
+STFT_network's OUTPUT : return real, imag
 _, signal = scipy.io.wavfile.read("./test_speech/speech.wav")
 sound = np.reshape(signal, (1, -1, 1))
 print(sound.shape)
-(1, 81168, 1)
+(1, 16384, 1)
 
-STFT_network의 입력 : [batch_size, time_step (signal length), channel == 1]
-STFT_network의 출력 : return real, imag
 real : [batch_size, time_step, frequency_bin]
 imag : [batch_size, time_step, frequency_bin]
     
-    네트워크의 출력 자체는 time_step과 frequency_bin이 transpose 상태
-    (스펙토그램이 옆으로 누워있는 형상)
-    이 출력의 스펙토그램을 보고 싶으면 다음과 같이 할 것
-        spec = tf.transpose(tf.complex(real, imag), perm = [0, 2, 1])
-        show_spectogram (spec, shape = (가로, 세로)
+    STFT Network's outputs is transformation of time_step, frequency_bin transpose
+    So,
+    spec = tf.transpose(tf.complex(real, imag), perm = [0, 2, 1])
+    show_spectogram (spec, shape = (width, height))
 
-1. Convolution Network에 넣고 싶으면
-    real, imag <== tf.reshape(real or imag, (batch_size, time_step, frequency_bin, 1)) 형태로 줄 것
-    만약 [batch_size, time_step, frequency_bin]를 [batch_size, frequency_bin, time_step, 1] 처럼 주고 싶다면...
-    real, imag <== tf.transpose(real or imag, perm = [0, 2, 1, 3]) <== tf.reshape(real or imag, (batch_size, time_step, frequency_bin, 1))
+1. If you want to be part of the Convolution Network,
+    real, imag  <= tf.reshape in real or image (batch_size, time_step, Frequency_bin, 1)) form
+    If you want to give [batch_size, time_step, Frequency_bin] like [batch_size, Frequency_bin, time_step, 1]...
+    real, imag  <= tf.transpose(real or imag, perm = [0, 2, 1, 3]) == tf.resape(real or imag, (batch_size, time_step, Frequency_bin, 1))
 
 
-2. 중간 네트워크가 없다면
-    ISTFT_network의 입력 : STFT_network의 출력을 그대로 이어서 받으면 됨
-    ISTFT_network의 출력 : return signal [batch_size, time_step (signal length), channel]
-    real : [batch_size, time_step, frequency_bin]
-    imag : [batch_size, time_step, frequency_bin]
+2. Without an intermediate network,
+    Input of ISTFT_network: STFT_network can be continuously received.
+    Output of ISTFT_network : return signal [batch_size, time_step (signal length), channel]
+    real : [batch_size, time_step, Frequency_bin]
+    imag : [batch_size, time_step, Frequency_bin]
 
-3. 기본 옵션
+3. Basic Options
     length = 1024, over_lapping = 256, padding = "same"
-    그리고 레이어의 trainable option은 "False"가 기본
-    학습을 하면 안됨. DFT kernel이 깨짐
+    And the layer's trainable option is based on "False".
+    Do not learn. DFT kernel is broken
 """
 
+
+'Short Time Fourier Transform via Neural Network'
 class STFT_network (tf.keras.layers.Layer):
     
 
-    def __init__ (self, length = 1024, over_lapping = 256, padding = "same"):
+    def __init__ (self, window_length = 1024, over_lapping = 256, padding = "same"):
         
         super(STFT_network, self).__init__()
         
-        self.window_length = length
+        self.window_length = window_length
         self.frequency_bin = int(self.window_length/2 + 1)
         self.over_lapping  = over_lapping
         self.padding = padding
@@ -99,49 +98,44 @@ class STFT_network (tf.keras.layers.Layer):
         
 
     def call (self, input_signal):
-        '''
-        inputs_signal : 3D Tensor [batch_size, signal_length, channel_number]
-        '''
+
+        'inputs_signal : 3D Tensor [batch_size, signal_length, channel_number]'
         real = self.real_fourier_convolution(input_signal)
         imag = self.imag_foruier_convolution(input_signal)
         
         return real, imag
 
 
-    
+'Inverse Short Time Fourier Transform via Neural Network'    
 class ISTFT_network (tf.keras.layers.Layer):
     
 
-    def __init__ (self, length = 1024, over_lapping = 256, padding = "same"):
+    def __init__ (self, window_length = 1024, over_lapping = 256, padding = "same"):
         
         super(ISTFT_network, self).__init__()
         
-        self.length = length
-        self.over_lapping = over_lapping
+        self.window_length = window_length
+        self.over_lapping  = over_lapping
         
-        self.cut_off = int(self.length / 2 + 1)
-        self.kernel_size = length
-        self.strides = over_lapping
-        self.padding = padding
+        self.cut_off     = int(self.window_length / 2 + 1)
+        self.kernel_size = window_length
+        self.strides     = over_lapping
+        self.padding     = padding
         
-        """
-        
-        """
-        self.window_coefficient = scipy.signal.get_window("hanning", self.length)
-        self.inverse_window = self.inverse_stft_window(self.window_coefficient, self.over_lapping)
+        self.window_coefficient = scipy.signal.get_window("hanning", self.window_length)
+        self.inverse_window     = self.inverse_stft_window(self.window_coefficient, self.over_lapping)
 
-        # 역푸리에 변환 커널
-        self.fourier_basis = np.fft.fft(np.eye(self.length))
-        self.fourier_basis = np.vstack([np.real(self.fourier_basis[:self.cut_off, :]), 
-                                        np.imag(self.fourier_basis[:self.cut_off, :])])
+        'Inverse Fourier Transform Kernel'
+        self.fourier_basis = np.fft.fft(np.eye(self.window_length))
+        self.fourier_basis = np.vstack([np.real(self.fourier_basis[:self.cut_off, :]), np.imag(self.fourier_basis[:self.cut_off, :])])
 
-        self.inverse_basis = self.inverse_window * np.linalg.pinv(self.fourier_basis).T[:, None, None, ]
+        self.inverse_basis = self.inverse_window * np.linalg.pinv(self.fourier_basis).T[ :, None, None, ]
         self.inverse_basis = self.inverse_basis.T
 
         
     def inverse_stft_window (self, window, hop_length):
 
-            # Ceiling division.
+            'Ceiling Division'
             window_length = len(window)
             denom = window ** 2
             overlaps = -(-window_length // hop_length) 
@@ -154,14 +148,14 @@ class ISTFT_network (tf.keras.layers.Layer):
         
     def build (self, inputs_shape):
         
-        self.expand_dims_lambda = Lambda(lambda x: K.expand_dims(x, axis=2))
-        self.Conv2DTranspose = Conv2DTranspose(filters = 1, 
+        self.expand_dims_lambda = Lambda(lambda x: K.expand_dims(x, axis = 2))
+        self.Conv2DTranspose    = Conv2DTranspose(filters = 1, 
                                                 kernel_size = (self.kernel_size, 1), 
                                                 strides = (self.strides, 1), 
                                                 padding = self.padding,
                                                 kernel_initializer = tf.keras.initializers.Constant(self.inverse_basis),
                                                 trainable = False)
-        self.squeeze_dims_lambda = Lambda(lambda x: K.squeeze(x, axis=2))
+        self.squeeze_dims_lambda = Lambda(lambda x: K.squeeze(x, axis = 2))
         
         super(ISTFT_network, self).build(inputs_shape)
         
@@ -169,19 +163,19 @@ class ISTFT_network (tf.keras.layers.Layer):
     def call (self, real, imag):
         '''
         inputs_signal : 3D Tensor [batch_size, time_step (signal length), channel_number (Frequency bin)]
-        Inverse Short Time Fourier Transform을 하기 위해서는...
-        입력 텐서의 크기가 배치 사이즈, 신호의 길이, 신호의 채널 형태로 들어와야 한다.
-        Spectogram의 입력 형태사 [배치 사이즈, 타임 스텝, 주파수 bin] 이고
+        To do Inverse Short Time Fourier Transform...
+        The size of the input tensor shall come in the form of the batch size, the length of the signal, and the channel form of the signal.
+        The input modalities of the Spectogram [deployment size, time step, frequency bin] are.
 
-        이를 axis = 2에서 concat한 다음
-        다시 axis = 2에서 expand_dims를 수행하면 [배치 사이즈. 타임 스텝, 1, 주파수 빈] 이다.
+        Concat it at Axis = 2.
+        If you perform expand_dims again at Axis = 2, [Deployment size. Time step, 1, frequency bin.
 
-        다시 말해서 타임 스텝 x 1 형태의 이미지가 주파수 빈 채널만큼 있는 셈
+        In other words, an image in the form of Time Step x 1 is as good as a frequency bin channel.
 
-        Conv 2D Tranpose를 하고 출력을 보면
-        [배치 사이즈, 신호의 길이, 1, 1] 형태이고
+        If you do Conv 2D Transpose and look at the output,
+        [batch size, signal length, 1, 1] It's a form.
 
-        squeeze로 사이즈를 줄여서 [배치 사이즈, 신호의 길이, 1] 형태로 만든다.
+        Reduce size with skew to form [batch size, signal length, 1].
         '''
         input_tensor = tf.concat([real, imag], axis = 2)
         outputs = self.expand_dims_lambda(input_tensor)
