@@ -6,7 +6,6 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.keras.backend as K
 from tensorflow.keras.layers import *
-
 """
 STFT_network's INPUT : [batch_size, time_step (signal length), channel == 1]
 STFT_network's OUTPUT : return real, imag

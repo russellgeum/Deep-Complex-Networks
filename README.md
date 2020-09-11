@@ -19,9 +19,6 @@ It then examines the performance of active functions in the complex numbers and 
 ```
 ./complex_layers
     __init__.py
-    STFT.py
-        class STFT_network
-        class ISTFT_network
     activations.py
         def CReLU
         def zReLU
@@ -32,7 +29,15 @@ It then examines the performance of active functions in the complex numbers and 
         class complex_Conv2D
         class conplex_Conv2DTranspose
         class complex_MaxPooling
+
+    normalization.py
         class complex_NaiveBatchNormalization
+        class complex_Batchnormalization2D
+./spectral_layers
+    __init__.py
+    STFT.py
+        class STFT_network
+        class ISTFT_network
 ```
 # Will be developed later
 ```
