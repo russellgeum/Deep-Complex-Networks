@@ -39,3 +39,10 @@ It then examines the performance of active functions in the complex numbers and 
         class STFT_network
         class ISTFT_network
 ```
+#
+# Will be developed later  
+```
+class complex_Conv3D
+class complex_Conv3DTranspose
+class complex_LSTM
+```

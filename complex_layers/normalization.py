@@ -10,6 +10,28 @@ import tensorflow.keras.backend as K
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+DEFINE INITIALIZERS
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+def sqrt_init(shape, dtype = None):
+    value = (1 / np.sqrt(2)) * K.ones(shape)
+    return value
+
+
+def sanitizedInitGet(init):
+    if init in ["sqrt_init"]:
+        return sqrt_init
+    else:
+        return initializers.get(init)
+
+
+def sanitizedInitSer(init):
+    if init in [sqrt_init]:
+        return "sqrt_init"
+    else:
+        return initializers.serialize(init)
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 DEFINE NAIVE BATCH NORMALIZATION
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 class complex_NaiveBatchNormalization (tf.keras.layers.Layer):
@@ -115,33 +137,10 @@ class complex_NaiveBatchNormalization (tf.keras.layers.Layer):
         return real_outputs, imag_outputs
 
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-DEFINE INITIALIZERS
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-def sqrt_init(shape, dtype=None):
-    value = (1 / np.sqrt(2)) * K.ones(shape)
-    return value
-
-
-def sanitizedInitGet(init):
-    if init in ["sqrt_init"]:
-        return sqrt_init
-    else:
-        return initializers.get(init)
-
-
-def sanitizedInitSer(init):
-    if init in [sqrt_init]:
-        return "sqrt_init"
-    else:
-        return initializers.serialize(init)
-
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 DEFINE COMPLEX STANDARDIZATION
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-def complex_standardization(input_centred, Vrr, Vii, Vri, layernorm = False, axis = -1):
+def complex_standardization (input_centred, Vrr, Vii, Vri, layernorm = False, axis = -1):
     """Complex Standardization of input
     
     Arguments:
@@ -198,6 +197,12 @@ def complex_standardization(input_centred, Vrr, Vii, Vri, layernorm = False, axi
     """
     [Batch_size, height, width, channels]
     ndim(input_centred) == 4
+        if ndim == 2:
+            Dense Layer (None, Node)
+        if ndim == 3:
+            Conv1D Layer (None, filters, channels)
+        if ndim == 4:
+            Conv2D Layer (None, height, width, channels)
     shape(input_centred) == [2, 256, 32, 16] --> [2, 256, 32, 8] is real, [2, 256, 32, 8] is imag
     shape(input_centred)[axis = -1] == 16
     
@@ -227,16 +232,24 @@ def complex_standardization(input_centred, Vrr, Vii, Vri, layernorm = False, axi
     broadcast_Wri = K.reshape(Wri, variances_broadcast)
     broadcast_Wii = K.reshape(Wii, variances_broadcast)
 
-    cat_W_4_real = K.concatenate([broadcast_Wrr, broadcast_Wii], axis=axis)
-    cat_W_4_imag = K.concatenate([broadcast_Wri, broadcast_Wri], axis=axis)
+    cat_W_4_real  = K.concatenate([broadcast_Wrr, broadcast_Wii], axis = axis)
+    cat_W_4_imag  = K.concatenate([broadcast_Wri, broadcast_Wri], axis = axis)
 
-    'for Conv2D'
-    centred_real = input_centred[:, :, :, :input_dim]
-    centred_imag = input_centred[:, :, :, input_dim:]
+    if (axis == 1 and ndim != 3) or ndim == 2:
+        centred_real = input_centred[:, :input_dim]
+        centred_imag = input_centred[:, input_dim:]
+    
+    elif ndim == 3:
+        centred_real = input_centred[:, :, :input_dim]
+        centred_imag = input_centred[:, :, input_dim:]
 
-    rolled_input = K.concatenate([centred_imag, centred_real], axis=axis)
+    elif ndim == 4:
+        centred_real = input_centred[:, :, :, :input_dim]
+        centred_imag = input_centred[:, :, :, input_dim:]
 
-    # wrr real + wri imag, wri real + wii imag
+    rolled_input = K.concatenate([centred_imag, centred_real], axis = axis)
+
+    'wrr real + wri imag, wri real + wii imag'
     output = cat_W_4_real * input_centred + cat_W_4_imag * rolled_input
     return output
 
@@ -244,7 +257,7 @@ def complex_standardization(input_centred, Vrr, Vii, Vri, layernorm = False, axi
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 DEFINE COMPLEX BATCH NORMALIZATION
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-def complex_batchnorm(input_centred, Vrr, Vii, Vri, beta, gamma_rr, gamma_ri, gamma_ii, scale = True, center = True, layernorm = False, axis = -1):
+def complex_batchnorm (input_centred, Vrr, Vii, Vri, beta, gamma_rr, gamma_ri, gamma_ii, scale = True, center = True, layernorm = False, axis = -1):
     """Complex Batch Normalization
     
     Arguments:
@@ -277,17 +290,27 @@ def complex_batchnorm(input_centred, Vrr, Vii, Vri, beta, gamma_rr, gamma_ri, ga
 
     if scale:
         standardized_output = complex_standardization(input_centred, Vrr, Vii, Vri, layernorm, axis = axis)
-        centred_real = standardized_output[:, :, :, :input_dim]
-        centred_imag = standardized_output[:, :, :, input_dim:]
+
+        if (axis == 1 and ndim != 3) or ndim == 2:
+            centred_real = standardized_output[:, :input_dim]
+            centred_imag = standardized_output[:, input_dim:]
+        
+        elif ndim == 3:
+            centred_real = standardized_output[:, :, :input_dim]
+            centred_imag = standardized_output[:, :, input_dim:]
+
+        elif ndim == 4:
+            centred_real = standardized_output[:, :, :, :input_dim]
+            centred_imag = standardized_output[:, :, :, input_dim:]
+
+        rolled_standardized_output = K.concatenate([centred_imag, centred_real], axis = axis)
 
         broadcast_gamma_rr = K.reshape(gamma_rr, gamma_broadcast_shape)
         broadcast_gamma_ri = K.reshape(gamma_ri, gamma_broadcast_shape)
         broadcast_gamma_ii = K.reshape(gamma_ii, gamma_broadcast_shape)
+        cat_gamma_4_real   = K.concatenate([broadcast_gamma_rr, broadcast_gamma_ii], axis = axis)
+        cat_gamma_4_imag   = K.concatenate([broadcast_gamma_ri, broadcast_gamma_ri], axis = axis)
 
-        cat_gamma_4_real = K.concatenate([broadcast_gamma_rr, broadcast_gamma_ii], axis = axis)
-        cat_gamma_4_imag = K.concatenate([broadcast_gamma_ri, broadcast_gamma_ri], axis = axis)
-
-        rolled_standardized_output = K.concatenate([centred_imag, centred_real], axis = axis)
         if center:
             broadcast_beta = K.reshape(beta, broadcast_beta_shape)
             return cat_gamma_4_real * standardized_output + cat_gamma_4_imag * rolled_standardized_output + broadcast_beta
@@ -302,9 +325,361 @@ def complex_batchnorm(input_centred, Vrr, Vii, Vri, beta, gamma_rr, gamma_ri, ga
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+DEFINE complex_Dense
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+class complex_Dense_BatchNorm (tf.keras.layers.Layer):
+
+    def __init__(self,
+                axis = -1,
+                momentum = 0.9,
+                epsilon = 1e-4,
+                center = True,
+                scale = True,
+                beta_initializer = 'zeros',
+                gamma_diag_initializer = 'sqrt_init',
+                gamma_off_initializer = 'zeros',
+                moving_mean_initializer = 'zeros',
+                moving_variance_initializer = 'sqrt_init',
+                moving_covariance_initializer = 'zeros',
+                beta_regularizer = None,
+                gamma_diag_regularizer = None,
+                gamma_off_regularizer = None,
+                beta_constraint = None,
+                gamma_diag_constraint = None,
+                gamma_off_constraint = None,
+                **kwargs):
+
+        super(complex_Dense_BatchNorm, self).__init__(**kwargs)
+        
+        self.supports_masking              = True
+        self.axis                          = axis
+        self.momentum                      = momentum
+        self.epsilon                       = epsilon
+        self.center                        = center
+        self.scale                         = scale
+        self.beta_initializer              = sanitizedInitGet(beta_initializer)
+        self.gamma_diag_initializer        = sanitizedInitGet(gamma_diag_initializer)
+        self.gamma_off_initializer         = sanitizedInitGet(gamma_off_initializer)
+        self.moving_mean_initializer       = sanitizedInitGet(moving_mean_initializer)
+        self.moving_variance_initializer   = sanitizedInitGet(moving_variance_initializer)
+        self.moving_covariance_initializer = sanitizedInitGet(moving_covariance_initializer)
+        self.beta_regularizer              = regularizers.get(beta_regularizer)
+        self.gamma_diag_regularizer        = regularizers.get(gamma_diag_regularizer)
+        self.gamma_off_regularizer         = regularizers.get(gamma_off_regularizer)
+        self.beta_constraint               = constraints .get(beta_constraint)
+        self.gamma_diag_constraint         = constraints .get(gamma_diag_constraint)
+        self.gamma_off_constraint          = constraints .get(gamma_off_constraint)
+
+    def build(self, input_shape):
+
+        ndim = len(input_shape)
+        dim  = input_shape[self.axis]
+        if dim is None:
+            raise ValueError('Axis ' + str(self.axis) + ' of ' 'input tensor should have a defined dimension ' 'but the layer received an input with shape ' + str(input_shape) + '.')
+
+        self.input_spec = InputSpec(ndim=len(input_shape), axes={self.axis: dim})
+        param_shape = (input_shape[self.axis] // 2,)        # Respectively, dim of real == 2, dim of imag == 2
+
+        if self.scale:        # Additional parameter
+            self.gamma_rr   = self.add_weight(shape=param_shape, name='gamma_rr', initializer=self.gamma_diag_initializer, regularizer=self.gamma_diag_regularizer, constraint=self.gamma_diag_constraint)
+            self.gamma_ii   = self.add_weight(shape=param_shape, name='gamma_ii', initializer=self.gamma_diag_initializer, regularizer=self.gamma_diag_regularizer, constraint=self.gamma_diag_constraint)
+            self.gamma_ri   = self.add_weight(shape=param_shape, name='gamma_ri', initializer=self.gamma_off_initializer, regularizer=self.gamma_off_regularizer, constraint=self.gamma_off_constraint)
+            self.moving_Vrr = self.add_weight(shape=param_shape, initializer=self.moving_variance_initializer, name='moving_Vrr', trainable=False)
+            self.moving_Vii = self.add_weight(shape=param_shape, initializer=self.moving_variance_initializer, name='moving_Vii', trainable=False)
+            self.moving_Vri = self.add_weight(shape=param_shape, initializer=self.moving_covariance_initializer, name='moving_Vri', trainable=False)
+        else:
+            self.gamma_rr   = None
+            self.gamma_ii   = None
+            self.gamma_ri   = None
+            self.moving_Vrr = None
+            self.moving_Vii = None
+            self.moving_Vri = None
+
+        if self.center:
+            self.beta        = self.add_weight(shape=(input_shape[self.axis],), name='beta', initializer=self.beta_initializer, regularizer=self.beta_regularizer, constraint=self.beta_constraint)
+            self.moving_mean = self.add_weight(shape=(input_shape[self.axis],), initializer=self.moving_mean_initializer, name='moving_mean', trainable=False)
+        else:
+            self.beta        = None
+            self.moving_mean = None
+
+        self.built = True
+
+    def call(self, inputs, training = None):
+
+        input_shape = K.int_shape(inputs) # (None, Node), Node could be decomposition real parts and imag part :None] == concat(real part, imag part, axis = -1)
+        ndim        = len(input_shape) # 2
+
+        reduction_axes = list(range(ndim)) # If ndim == 4, list(range(ndim)) == [0, 1]
+        del reduction_axes[self.axis] # --> [0], 즉 배치 사이즈
+
+        input_dim = input_shape[self.axis] // 2           # 1
+        mu        = K.mean(inputs, axis = reduction_axes) # real mu, imag mu
+
+        broadcast_mu_shape            = [1] * len(input_shape) # [1, 1]
+        broadcast_mu_shape[self.axis] = input_shape[self.axis] # [1, input_shape[self.axis]]
+        broadcast_mu                  = K.reshape(mu, broadcast_mu_shape) # mu shape is [1, 2]
+
+        """
+        real parts에는 real mean을 빼고
+        imag parts에는 imag mean을 뺀다
+        centred_squared == (x - E(x))^2
+        """
+        if self.center:
+            input_centred = inputs - broadcast_mu
+        else:
+            input_centred = inputs
+
+        centred_squared = input_centred ** 2
+
+        'for Dense'
+        centred_squared_real = centred_squared[:, :input_dim] # real
+        centred_squared_imag = centred_squared[:, input_dim:] # imag
+        centred_real = input_centred[:, :input_dim] # real
+        centred_imag = input_centred[:, input_dim:] # imag
+
+        if self.scale:
+            Vrr = K.mean(centred_squared_real, axis=reduction_axes) + self.epsilon
+            Vii = K.mean(centred_squared_imag, axis=reduction_axes) + self.epsilon
+            Vri = K.mean(centred_real * centred_imag, axis=reduction_axes,) # Vri contains the real and imaginary covariance for each feature map.
+        elif self.center:
+            Vrr = None
+            Vii = None
+            Vri = None
+        else:
+            raise ValueError('Error. Both scale and center in batchnorm are set to False.')
+
+        """
+        1. Calcultae BatchNormalization for real parts, imag parts of complex numbers
+        2. If Training == True, Under self.center and self.scale condition, Update parameter moving mean, moving_Vrr, moving_Vii, moving_Vri
+        """
+        input_bn = complex_batchnorm(input_centred, Vrr, Vii, Vri, self.beta, self.gamma_rr, self.gamma_ri, self.gamma_ii, self.scale, self.center, axis = self.axis)
+
+        if training in {0, False}:
+            return input_bn
+        else: # traning is True!!!
+            update_list = []
+            if self.center:
+                update_list.append(K.moving_average_update(self.moving_mean, mu, self.momentum))
+            if self.scale:
+                update_list.append(K.moving_average_update(self.moving_Vrr, Vrr, self.momentum))
+                update_list.append(K.moving_average_update(self.moving_Vii, Vii, self.momentum))
+                update_list.append(K.moving_average_update(self.moving_Vri, Vri, self.momentum))
+            self.add_update(update_list, inputs)
+
+            def normalize_inference():
+                if self.center:
+                    inference_centred = inputs - K.reshape(self.moving_mean, broadcast_mu_shape)
+                else:
+                    inference_centred = inputs
+                return complex_batchnorm(inference_centred, 
+                                self.moving_Vrr, self.moving_Vii, self.moving_Vri, self.beta, 
+                                self.gamma_rr, self.gamma_ri, self.gamma_ii, self.scale, self.center, axis = self.axis)
+
+        # Pick the normalized form corresponding to the training phase.
+        return K.in_train_phase(input_bn, normalize_inference, training = training)
+
+    def get_config(self):
+        config = {'axis': self.axis,
+            'momentum': self.momentum,
+            'epsilon': self.epsilon,
+            'center': self.center,
+            'scale': self.scale,
+            'beta_initializer':              sanitizedInitSer(self.beta_initializer),
+            'gamma_diag_initializer':        sanitizedInitSer(self.gamma_diag_initializer),
+            'gamma_off_initializer':         sanitizedInitSer(self.gamma_off_initializer),
+            'moving_mean_initializer':       sanitizedInitSer(self.moving_mean_initializer),
+            'moving_variance_initializer':   sanitizedInitSer(self.moving_variance_initializer),
+            'moving_covariance_initializer': sanitizedInitSer(self.moving_covariance_initializer),
+            'beta_regularizer':              regularizers.serialize(self.beta_regularizer),
+            'gamma_diag_regularizer':        regularizers.serialize(self.gamma_diag_regularizer),
+            'gamma_off_regularizer':         regularizers.serialize(self.gamma_off_regularizer),
+            'beta_constraint':               constraints .serialize(self.beta_constraint),
+            'gamma_diag_constraint':         constraints .serialize(self.gamma_diag_constraint),
+            'gamma_off_constraint':          constraints .serialize(self.gamma_off_constraint),}
+        base_config = super(complex_BatchNorm2D, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+DEFINE complex_BatchNorm1D
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+class complex_BatchNorm1D (tf.keras.layers.Layer):
+
+    def __init__(self,
+                axis = -1,
+                momentum = 0.9,
+                epsilon = 1e-4,
+                center = True,
+                scale = True,
+                beta_initializer = 'zeros',
+                gamma_diag_initializer = 'sqrt_init',
+                gamma_off_initializer = 'zeros',
+                moving_mean_initializer = 'zeros',
+                moving_variance_initializer = 'sqrt_init',
+                moving_covariance_initializer = 'zeros',
+                beta_regularizer = None,
+                gamma_diag_regularizer = None,
+                gamma_off_regularizer = None,
+                beta_constraint = None,
+                gamma_diag_constraint = None,
+                gamma_off_constraint = None,
+                **kwargs):
+
+        super(complex_BatchNorm1D, self).__init__(**kwargs)
+        
+        self.supports_masking              = True
+        self.axis                          = axis
+        self.momentum                      = momentum
+        self.epsilon                       = epsilon
+        self.center                        = center
+        self.scale                         = scale
+        self.beta_initializer              = sanitizedInitGet(beta_initializer)
+        self.gamma_diag_initializer        = sanitizedInitGet(gamma_diag_initializer)
+        self.gamma_off_initializer         = sanitizedInitGet(gamma_off_initializer)
+        self.moving_mean_initializer       = sanitizedInitGet(moving_mean_initializer)
+        self.moving_variance_initializer   = sanitizedInitGet(moving_variance_initializer)
+        self.moving_covariance_initializer = sanitizedInitGet(moving_covariance_initializer)
+        self.beta_regularizer              = regularizers.get(beta_regularizer)
+        self.gamma_diag_regularizer        = regularizers.get(gamma_diag_regularizer)
+        self.gamma_off_regularizer         = regularizers.get(gamma_off_regularizer)
+        self.beta_constraint               = constraints .get(beta_constraint)
+        self.gamma_diag_constraint         = constraints .get(gamma_diag_constraint)
+        self.gamma_off_constraint          = constraints .get(gamma_off_constraint)
+
+    def build(self, input_shape):
+
+        ndim = len(input_shape)        # 3
+        dim = input_shape[self.axis]        # [ :, :, dim]
+        if dim is None:
+            raise ValueError('Axis ' + str(self.axis) + ' of ' 'input tensor should have a defined dimension ' 'but the layer received an input with shape ' + str(input_shape) + '.')
+        
+        self.input_spec = InputSpec(ndim=len(input_shape), axes={self.axis: dim})
+        param_shape = (input_shape[self.axis] // 2,)        # Respectively, dim of real == 4, dim of imag == 4
+
+        if self.scale:        # Additional parameter
+            self.gamma_rr   = self.add_weight(shape=param_shape, name='gamma_rr', initializer=self.gamma_diag_initializer, regularizer=self.gamma_diag_regularizer, constraint=self.gamma_diag_constraint)
+            self.gamma_ii   = self.add_weight(shape=param_shape, name='gamma_ii', initializer=self.gamma_diag_initializer, regularizer=self.gamma_diag_regularizer, constraint=self.gamma_diag_constraint)
+            self.gamma_ri   = self.add_weight(shape=param_shape, name='gamma_ri', initializer=self.gamma_off_initializer, regularizer=self.gamma_off_regularizer, constraint=self.gamma_off_constraint)
+            self.moving_Vrr = self.add_weight(shape=param_shape, initializer=self.moving_variance_initializer, name='moving_Vrr', trainable=False)
+            self.moving_Vii = self.add_weight(shape=param_shape, initializer=self.moving_variance_initializer, name='moving_Vii', trainable=False)
+            self.moving_Vri = self.add_weight(shape=param_shape, initializer=self.moving_covariance_initializer, name='moving_Vri', trainable=False)
+        else:
+            self.gamma_rr   = None
+            self.gamma_ii   = None
+            self.gamma_ri   = None
+            self.moving_Vrr = None
+            self.moving_Vii = None
+            self.moving_Vri = None
+
+        if self.center:
+            self.beta        = self.add_weight(shape=(input_shape[self.axis],), name='beta', initializer=self.beta_initializer, regularizer=self.beta_regularizer, constraint=self.beta_constraint)
+            self.moving_mean = self.add_weight(shape=(input_shape[self.axis],), initializer=self.moving_mean_initializer, name='moving_mean', trainable=False)
+        else:
+            self.beta        = None
+            self.moving_mean = None
+
+        self.built = True
+
+    def call(self, inputs, training = None):
+
+        input_shape = K.int_shape(inputs) # .shape
+        ndim        = len(input_shape) # 4
+
+        reduction_axes = list(range(ndim)) # If ndim == 4, list(range(ndim)) == [0, 1, 2, 3]
+        del reduction_axes[self.axis] # --> [0, 1, 2], self.axis == -1
+
+        input_dim = input_shape[self.axis] // 2
+        mu        = K.mean(inputs, axis = reduction_axes) # real mu, imag mu
+
+        broadcast_mu_shape            = [1] * len(input_shape) # [1, 1, 1, 1]
+        broadcast_mu_shape[self.axis] = input_shape[self.axis] # [1, 1, 1, input_shape[self.axis]]
+        broadcast_mu                  = K.reshape(mu, broadcast_mu_shape) # mu shape is [1, 1, 1, 2]
+
+        """
+        real parts에는 real mean을 빼고
+        imag parts에는 imag mean을 뺀다
+        centred_squared == (x - E(x))^2
+        """
+        if self.center:
+            input_centred = inputs - broadcast_mu
+        else:
+            input_centred = inputs
+
+        centred_squared = input_centred ** 2
+
+        'for Conv2D'
+        centred_squared_real = centred_squared[:, :, :input_dim] # real
+        centred_squared_imag = centred_squared[:, :, input_dim:] # imag
+        centred_real = input_centred[:, :, :input_dim] # real
+        centred_imag = input_centred[:, :, input_dim:] # imag
+
+        if self.scale:
+            Vrr = K.mean(centred_squared_real, axis=reduction_axes) + self.epsilon
+            Vii = K.mean(centred_squared_imag, axis=reduction_axes) + self.epsilon
+            Vri = K.mean(centred_real * centred_imag, axis=reduction_axes,) # Vri contains the real and imaginary covariance for each feature map.
+        elif self.center:
+            Vrr = None
+            Vii = None
+            Vri = None
+        else:
+            raise ValueError('Error. Both scale and center in batchnorm are set to False.')
+
+        """
+        1. Calcultae BatchNormalization for real parts, imag parts of complex numbers
+        2. If Training == True, Under self.center and self.scale condition, Update parameter moving mean, moving_Vrr, moving_Vii, moving_Vri
+        """
+        input_bn = complex_batchnorm(input_centred, Vrr, Vii, Vri, self.beta, self.gamma_rr, self.gamma_ri, self.gamma_ii, self.scale, self.center, axis = self.axis)
+
+        if training in {0, False}:
+            return input_bn
+        else: # traning is True!!!
+            update_list = []
+            if self.center:
+                update_list.append(K.moving_average_update(self.moving_mean, mu, self.momentum))
+            if self.scale:
+                update_list.append(K.moving_average_update(self.moving_Vrr, Vrr, self.momentum))
+                update_list.append(K.moving_average_update(self.moving_Vii, Vii, self.momentum))
+                update_list.append(K.moving_average_update(self.moving_Vri, Vri, self.momentum))
+            self.add_update(update_list, inputs)
+
+            def normalize_inference():
+                if self.center:
+                    inference_centred = inputs - K.reshape(self.moving_mean, broadcast_mu_shape)
+                else:
+                    inference_centred = inputs
+                return complex_batchnorm(inference_centred, 
+                                self.moving_Vrr, self.moving_Vii, self.moving_Vri, self.beta, 
+                                self.gamma_rr, self.gamma_ri, self.gamma_ii, self.scale, self.center, axis = self.axis)
+
+        # Pick the normalized form corresponding to the training phase.
+        return K.in_train_phase(input_bn, normalize_inference, training = training)
+
+    def get_config(self):
+        config = {'axis': self.axis,
+            'momentum': self.momentum,
+            'epsilon': self.epsilon,
+            'center': self.center,
+            'scale': self.scale,
+            'beta_initializer':              sanitizedInitSer(self.beta_initializer),
+            'gamma_diag_initializer':        sanitizedInitSer(self.gamma_diag_initializer),
+            'gamma_off_initializer':         sanitizedInitSer(self.gamma_off_initializer),
+            'moving_mean_initializer':       sanitizedInitSer(self.moving_mean_initializer),
+            'moving_variance_initializer':   sanitizedInitSer(self.moving_variance_initializer),
+            'moving_covariance_initializer': sanitizedInitSer(self.moving_covariance_initializer),
+            'beta_regularizer':              regularizers.serialize(self.beta_regularizer),
+            'gamma_diag_regularizer':        regularizers.serialize(self.gamma_diag_regularizer),
+            'gamma_off_regularizer':         regularizers.serialize(self.gamma_off_regularizer),
+            'beta_constraint':               constraints .serialize(self.beta_constraint),
+            'gamma_diag_constraint':         constraints .serialize(self.gamma_diag_constraint),
+            'gamma_off_constraint':          constraints .serialize(self.gamma_off_constraint),}
+        base_config = super(complex_BatchNorm2D, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 DEFINE complex_BatchNorm2D
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-class complex_BatchNorm2D(tf.keras.layers.Layer):
+class complex_BatchNorm2D (tf.keras.layers.Layer):
     """Complex version of the real domain
     Batch normalization layer (Ioffe and Szegedy, 2014).
     Normalize the activations of the previous complex layer at each batch,
@@ -525,42 +900,75 @@ class complex_BatchNorm2D(tf.keras.layers.Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-# class complex_BatchNormalization2d (tf.keras.layers.Layer):
 
-#     def __init__(self):
-#         super(complex_BatchNormalization, self).__init__()
-    
-#     def call (self, real, imag, training = None):
 
-#         inputs  = tf.concat([real, imag], axis = -1)
-#         outputs = complex_BatchNorm2D()(inputs, training = training)
+def complex_BatchNormalization (real, imag, training = None):
 
-#         return outputs
+    inputs = tf.concat([real, imag], axis = -1)
+    outputs = complex_Dense_BatchNorm()(inputs, training = training)
+
+    input_dim = outputs.shape[-1] // 2
+    real = outputs[ :, :input_dim]
+    imag = outputs[ :, input_dim:]
+
+    return real, imag
+
+
+def complex_BatchNormalization1D (real, imag, training = None):
+
+    inputs = tf.concat([real, imag], axis = -1)
+    outputs = complex_BatchNorm1D()(inputs, training = training)
+
+    input_dim = outputs.shape[-1] // 2
+    real = outputs[ :, :, :input_dim]
+    imag = outputs[ :, :, input_dim:]
+
+    return real, imag
+
+
+def complex_BatchNormalization2D (real, imag, training = None):
+
+    inputs = tf.concat([real, imag], axis = -1)
+    outputs = complex_BatchNorm2D()(inputs, training = training)
+
+    input_dim = outputs.shape[-1] // 2
+    real = outputs[ :, :, :, :input_dim]
+    imag = outputs[ :, :, :, input_dim:]
+
+    return real, imag
+
+
 
 
 if __name__ == "__main__":
-    #
-    # real = tf.ones(shape = (2, 512, 64, 1))
-    # imag = tf.ones(shape = (2, 512, 64, 1))
-    # real, imag = complex_Conv2D(8, (3, 3), (2, 2), "same")(real, imag)
+    '''
+    복소수 배치 정규화 성능 검증
+    inputs = tf.random.uniform(shape = [1, 64, 64, 2])
+    outputs = complex_BatchNorm2D()(inputs, True)
 
-    # inputs = tf.concat([real, imag], axis = -1)
+    inputs_smaple = inputs[ :, :64, :64, 0].numpy()
+    inputs_smaple = inputs_smaple.flatten()
+    outputs_smaple = outputs[ :, :64, :64, 0].numpy()
+    outputs_smaple = outputs_smaple.flatten()
 
-    #
-    # inputs = tf.random.uniform(shape = [1, 64, 64, 2])
-    # outputs = complex_BatchNorm2D()(inputs, True)
-
-    # inputs_smaple = inputs[ :, :64, :64, 0].numpy()
-    # inputs_smaple = inputs_smaple.flatten()
-    # outputs_smaple = outputs[ :, :64, :64, 0].numpy()
-    # outputs_smaple = outputs_smaple.flatten()
-
-    # print(np.min(inputs_smaple), np.max(inputs_smaple), np.mean(inputs_smaple))
-    # print(np.min(outputs_smaple), np.max(outputs_smaple), np.mean(outputs_smaple))
-
+    print(np.min(inputs_smaple), np.max(inputs_smaple), np.mean(inputs_smaple))
+    print(np.min(outputs_smaple), np.max(outputs_smaple), np.mean(outputs_smaple))
+    '''
     real = tf.keras.Input(shape = [64, 64, 1])
     imag = tf.keras.Input(shape = [64, 64, 1])
+    out1, out2 = complex_BatchNormalization2D(real, imag, True)
+    model = tf.keras.Model(inputs = [real, imag], outputs = [out1, out2])
+    model.summary()
 
-    out1, out2 = complex_BatchNormalization2d(real, imag, True)
+    real = tf.keras.Input(shape = [64, 1])
+    imag = tf.keras.Input(shape = [64, 1])
+    out1, out2 = complex_BatchNormalization1D(real, imag, True)
+    model = tf.keras.Model(inputs = [real, imag], outputs = [out1, out2])
+    model.summary()
+
+
+    real = tf.keras.Input(shape = [64])
+    imag = tf.keras.Input(shape = [64])
+    out1, out2 = complex_BatchNormalization(real, imag, True)
     model = tf.keras.Model(inputs = [real, imag], outputs = [out1, out2])
     model.summary()
