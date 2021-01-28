@@ -96,4 +96,5 @@ Non-trainable params: 5
 class complex_Conv3D
 class complex_Conv3DTranspose
 class complex_LSTM
+class complex_Transformer
 ```
