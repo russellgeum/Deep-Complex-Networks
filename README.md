@@ -6,18 +6,13 @@
 - Complex domain backpropagation  
   IEEE transactions on Circuits and systems II: analog and digital signal processing, 39(5):330–334, 1992.  
 # About Deep Complex Networks
-Models of ordinary deep learning update parameters in the real numbers.  
-But should it be real number? Can you think about deep learning model in the field of complex numbers?  
-Deep learning in complex numbers has more expressive power than in the real numbers. (It is said that there are many advantages.)
-This paper introduces the neural network module in the field of multiple numbers, and introduces some active functions as possible.
-In this repo, the solution networks and proposed activation functions are implemented.  
-It then examines the performance of active functions in the complex numbers and examines the following mathematical issues.  
-**2021 02 03 Issue  
-TensorFlow 2.4.1 is not support Complex Batchnormalization module  (I will modify thie problem)**  
+Models of ordinary deep learning update parameters in the real numbers. But should it be real number? Can you think about deep learning model in the field of complex numbers? Deep learning in complex numbers has more expressive power than in the real numbers. (It is said that there are many advantages.). This paper introduces the neural network module in the field of multiple numbers, and introduces some active functions as possible. In this repo, the solution networks and proposed activation functions are implemented. It then examines the performance of active functions in the complex numbers and examines the following mathematical issues.  
 ![activation](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/sample/activation.png)
 ![architecture](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/sample/architecture.png)
 # Requirements  
 TensorFlow == 2.2  
+**2021 02 03 Issue  
+TensorFlow 2.4.1 is not support Complex Batchnormalization module  (I will modify thie problem)**  
 # Directory  
 !!!  My module assumes to input the real parts and imagnary parts separately.  
 ```
