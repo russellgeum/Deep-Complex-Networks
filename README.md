@@ -5,7 +5,6 @@
   URL : https://arxiv.org/abs/1602.09046  
 - Complex domain backpropagation  
   IEEE transactions on Circuits and systems II: analog and digital signal processing, 39(5):330–334, 1992.  
-#
 # About Deep Complex Networks
 Models of ordinary deep learning update parameters in the real numbers.  
 But should it be real number? Can you think about deep learning model in the field of complex numbers?  
@@ -15,10 +14,8 @@ In this repo, the solution networks and proposed activation functions are implem
 It then examines the performance of active functions in the complex numbers and examines the following mathematical issues.  
 2021 02 03 Issue  
 TensorFlow 2.4.1 is not support Complex Batchnormalization module  (I will modify thie problem)  
-#
 # Requirements  
 TensorFlow == 2.2  
-#
 # Directory  
 !!!  My module assumes to input the real parts and imagnary parts separately.  
 ```
@@ -51,8 +48,7 @@ TensorFlow == 2.2
           class STFT_network
           class ISTFT_network
 ```
-#
-# Usage
+# Usage (Example)
 ```
 Ex 1, (real, imag) -> complex_conv2d -> complex_activation -> complex_batchnorm
 from complex_layers.networks import *
@@ -94,7 +90,6 @@ Total params: 10
 Trainable params: 5
 Non-trainable params: 5
 ```
-#
 # Will be developed later  
 ```
 class complex_Conv3D
