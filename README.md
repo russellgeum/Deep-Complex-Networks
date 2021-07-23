@@ -6,14 +6,11 @@
 - Complex domain backpropagation  
   IEEE transactions on Circuits and systems II: analog and digital signal processing, 39(5):330–334, 1992.  
 # About Deep Complex Networks
-Models of ordinary deep learning update parameters in the real numbers.  
-But should it be real number? Can you think about deep learning model in the field of complex numbers?  
+Most deep learning models update real parameters during training.  
+But should it be real parameter? Can you think about deep learning model trained complex numbers?  
 Deep learning in complex numbers has more expressive power than in the real numbers.  
-This paper introduces the neural network module in the field of multiple numbers.  
-And This introduces some active functions as possible.  
-In this repo, the solution networks and proposed activation functions are implemented.  
-It then examines the performance of active functions in the complex numbers.  
-But some complex neural network layer have mathematical issues.  
+Some papers introduces the complex neural network frameworks and some activation function.  
+This repository gives you complex neural networks, activation functions and som signal processing layer.  
 ![activation](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/sample/activation.png)
 ![architecture](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/sample/architecture.png)
 # Requirements  
@@ -25,10 +22,11 @@ pytorch >= 1.8.0
 tensorflow == 2.2
 
 2021 02 03 Issue  
-tensorflow 2.4.1 is not support Complex Batchnormalization module (I will modify thie problem)
+텐서플로우 2.2보다 큰 버전은 complex_BatchNorm 연산이 되지 않습니다.
+2021 07 23 Issues
+텐서플로우 버전은 더 이상 개발하지 않습니다.
 ```
 # Directory  
-!!!  My module assumes to input the real parts and imagnary parts separately.  
 ```
 ./tensorflow
   ./complex_layers
@@ -41,17 +39,8 @@ tensorflow 2.4.1 is not support Complex Batchnormalization module (I will modify
       layer.py
           class complex_Dense
           class complex_Conv2D
-          class conplex_Conv2DTranspose
           class complex_Conv1D
-          class complex_Conv1dTrasnpose
-          class complex_MaxPooling
-          class complex_NaiveBatchNormalization
-          class complex_Dense_BatchNorm
-          class complex_BatchNorm1D
-          class complex_BatchNorm2D
-          def complex_BatchNormalization
-          def complex_BatchNormalization1D
-          def complex_BatchNormalization2D
+          ... ...
   ./spectral_layers
       __init__.py
       STFT.py
@@ -64,7 +53,7 @@ tensorflow 2.4.1 is not support Complex Batchnormalization module (I will modify
           class STFT
           class InverseSTFT
 ```
-# Usage (Example)
+# Usage (Tensorflow Example)
 ```
 Ex 1, (real, imag) -> complex_conv2d -> complex_activation -> complex_batchnorm
 from complex_layers.layer import *
@@ -107,6 +96,24 @@ Non-trainable params: 5
 ```
 # Will be...    
 ```
+Signal Processing Layer
+FFT
+Wavelet
+MFCC
+
+pytorch
+class compelx_Dense
+class complex_Conv1d
+class complex_Conv2d
+class complex_Conv3d
+class complex_Conv1dTraspose
+class complex_Conv2dTraspose
+class complex_Conv3dTraspose
+class complex_LSTM
+class complex_Attention
+class complex_BatchNorm1D
+class complex_BatchNorm2D
+
 tensorflow
 class complex_Conv3D
 class complex_Conv3DTranspose
@@ -123,7 +130,4 @@ class complex_Conv2dTraspose
 class complex_Conv3dTraspose
 class complex_LSTM
 class complex_Attention
-
-FFT
-complex_BatchNormalization (1D, 2D) 수정할 것
 ```

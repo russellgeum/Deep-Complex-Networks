@@ -12,8 +12,8 @@ import torch.nn.functional as F
 
 
 'https://github.com/pseeth/torch-stft'
-def window_sumsquare(window, n_frames, hop_length=200, win_length=800,
-                     n_fft=800, dtype=np.float32, norm=None):
+def window_sumsquare(
+        window, n_frames, hop_length=200, win_length=800, n_fft=800, dtype=np.float32, norm=None):
     """
     # from librosa 0.6
     Compute the sum-square envelope of a window function at a given hop length.
