@@ -10,7 +10,7 @@ Most deep learning models update real parameters during training.
 But should it be real parameter? Can you think about deep learning model trained complex numbers?  
 Deep learning in complex numbers has more expressive power than in the real numbers.  
 Some papers introduces the complex neural network frameworks and some activation function.  
-This repository gives you complex neural networks, activation functions and som signal processing layer.  
+This repository gives you complex neural networks, activation functions and some signal processing layer.  
 ![activation](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/sample/activation.png)
 ![architecture](https://github.com/Doyosae/Deep_Complex_Networks/blob/master/sample/architecture.png)
 # Requirements  
