@@ -21,10 +21,10 @@ librsoa == 0.7.2
 pytorch >= 1.8.0
 tensorflow == 2.2
 
-2021 02 03 Issue  
-텐서플로우 2.2보다 큰 버전은 complex_BatchNorm 연산이 되지 않습니다.
-2021 07 23 Issues
-텐서플로우 버전은 더 이상 개발하지 않습니다.
+2021-02-03 Issue
+Versions of TensorFlow greater than 2.2 do not support the complex_BatchNorm operation.
+2021-07-23 Issue
+This repository will no longer be developed.
 ```
 # Directory  
 ```
@@ -94,7 +94,7 @@ Total params: 10
 Trainable params: 5
 Non-trainable params: 5
 ```
-# Will be...    
+# Will be (archived)
 ```
 Signal Processing Layer
 FFT
